@@ -1,0 +1,14 @@
+version: 1
+components:
+  comp_web_app:
+    name: Web App
+    kind: web_ui
+  comp_platform_api:
+    name: Platform API
+    kind: api_service
+  comp_platform_worker:
+    name: Platform Worker
+    kind: worker
+  comp_relational_database:
+    name: Relational Database
+    kind: managed_service

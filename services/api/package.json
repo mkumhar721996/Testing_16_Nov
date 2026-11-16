@@ -9,6 +9,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/main.js",
     "test": "vitest run",
+    "migrate": "tsc -p tsconfig.build.json && node dist/db/migrate.js",
     "e2e": "playwright test",
     "devloop": "tsc -p tsconfig.json --noEmit && vitest run"
   },

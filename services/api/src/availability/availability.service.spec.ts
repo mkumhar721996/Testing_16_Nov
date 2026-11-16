@@ -41,6 +41,14 @@ describe('AvailabilityService', () => {
     expect((await repo.findById('other-item'))!.available).toBe(true);
   });
 
+  it('answers 404, not 500, when the item vanishes between check and write', async () => {
+    const repo = new InMemoryMenuItemRepository([item('i1', 'r1')]);
+    vi.spyOn(repo, 'setAvailability').mockRejectedValue(new Error('Menu item i1 not found'));
+    await expect(new AvailabilityService(repo).setAvailability('r1', 'i1', false)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
   it('rejects an unknown item', async () => {
     const svc = new AvailabilityService(new InMemoryMenuItemRepository([]));
     await expect(svc.setAvailability('r1', 'nope', false)).rejects.toBeInstanceOf(NotFoundException);

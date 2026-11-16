@@ -15,10 +15,15 @@ import { PgMenuItemRepository } from './pg-menu-item.repository';
     AvailabilityService,
     {
       provide: MENU_ITEM_REPOSITORY,
-      useFactory: () =>
-        process.env.DATABASE_URL
-          ? new PgMenuItemRepository(new Pool({ connectionString: process.env.DATABASE_URL }))
-          : new InMemoryMenuItemRepository(DEV_MENU_ITEMS),
+      useFactory: () => {
+        if (process.env.DATABASE_URL) {
+          return new PgMenuItemRepository(new Pool({ connectionString: process.env.DATABASE_URL }));
+        }
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('DATABASE_URL is required in production');
+        }
+        return new InMemoryMenuItemRepository(DEV_MENU_ITEMS);
+      },
     },
   ],
   exports: [MENU_ITEM_REPOSITORY],

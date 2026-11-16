@@ -16,6 +16,11 @@ export class AvailabilityService {
     if (item.restaurantId !== partnerRestaurantId) {
       throw new ForbiddenException("Item belongs to another restaurant");
     }
-    return this.repo.setAvailability(itemId, available);
+    try {
+      return await this.repo.setAvailability(itemId, available);
+    } catch {
+      // The item was removed after the ownership check.
+      throw new NotFoundException(`Item ${itemId} not found`);
+    }
   }
 }

@@ -1,5 +1,5 @@
-import { BadRequestException, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { describe, expect, it } from 'vitest';
+import { BadRequestException, ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { describe, expect, it, vi } from 'vitest';
 import { AvailabilityController } from './availability.controller';
 import { AvailabilityService } from './availability.service';
 import { InMemoryMenuItemRepository } from './in-memory-menu-item.repository';
@@ -26,5 +26,16 @@ describe('AvailabilityController', () => {
     const guard = new PartnerRestaurantGuard();
     expect(() => guard.canActivate(ctx({}))).toThrow(UnauthorizedException);
     expect(guard.canActivate(ctx({ 'x-partner-restaurant-id': 'r1' }))).toBe(true);
+  });
+
+  it('refuses the header stand-in in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    try {
+      expect(() => new PartnerRestaurantGuard().canActivate(ctx({ 'x-partner-restaurant-id': 'r1' }))).toThrow(
+        ForbiddenException,
+      );
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });

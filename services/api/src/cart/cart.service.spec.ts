@@ -27,6 +27,11 @@ describe('CartService', () => {
     expect(view.lines[0]).toMatchObject({ itemId: 'i1', quantity: 2, available: false });
   });
 
+  it('blocks checkout of an empty cart', async () => {
+    const { cart } = setup();
+    await expect(cart.checkout('nope')).rejects.toMatchObject({ status: 409, response: { code: 'CART_EMPTY' } });
+  });
+
   it('blocks checkout while a line is sold out (AC 7)', async () => {
     const { cart, repo } = setup();
     await cart.addItem('c1', 'i1', 1);

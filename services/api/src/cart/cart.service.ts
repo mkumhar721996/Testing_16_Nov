@@ -42,7 +42,9 @@ export class CartService {
   }
 
   async checkout(cartId: string): Promise<{ status: 'ready' }> {
-    const soldOut = (await this.getCart(cartId)).lines.filter((l) => !l.available).map((l) => l.itemId);
+    const { lines } = await this.getCart(cartId);
+    if (lines.length === 0) throw new ConflictException({ code: 'CART_EMPTY' });
+    const soldOut = lines.filter((l) => !l.available).map((l) => l.itemId);
     if (soldOut.length > 0) throw new ConflictException({ code: 'CART_HAS_SOLD_OUT_ITEMS', itemIds: soldOut });
     return { status: 'ready' };
   }

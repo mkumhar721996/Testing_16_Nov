@@ -4,6 +4,6 @@ import App from './App'
 describe('App', () => {
   it('renders the heading', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'Web App' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
   })
 })

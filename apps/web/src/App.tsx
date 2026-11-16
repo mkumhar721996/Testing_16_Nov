@@ -1,7 +1,8 @@
+import { DashboardPage } from './dashboard/DashboardPage'
+
+// Sign-in is owned by another story; until a session exists the signed-in user is a placeholder.
+const SIGNED_IN_USER = { name: 'Signed-in user', email: 'user@example.com' }
+
 export default function App() {
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50">
-      <h1 className="text-3xl font-bold text-slate-900">Web App</h1>
-    </main>
-  )
+  return <DashboardPage user={SIGNED_IN_USER} />
 }

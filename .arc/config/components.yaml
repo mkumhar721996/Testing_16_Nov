@@ -3,12 +3,44 @@ components:
   comp_web_app:
     name: Web App
     kind: web_ui
+    directory: apps/web
+    stack:
+      choices:
+        styling: tailwind
+        language: typescript
+        framework: react + vite
+        package_manager: pnpm
+        testing_tool_e2e: playwright
+        testing_tool_unit: vitest
+      notes: no existing code in repo; proposed and confirmed
   comp_platform_api:
     name: Platform API
     kind: api_service
+    directory: services/api
+    stack:
+      choices:
+        database: postgresql
+        language: typescript
+        framework: nestjs
+        package_manager: pnpm
+        testing_tool_e2e: playwright
+        testing_tool_unit: vitest
+      notes: styling not applicable — API only
   comp_platform_worker:
     name: Platform Worker
     kind: worker
+    directory: services/worker
+    stack:
+      choices:
+        database: postgresql
+        language: typescript
+        package_manager: pnpm
+        testing_tool_unit: vitest
+      notes: pg-boss job queue library on the PostgreSQL job table; no user-facing
+        surface, so no e2e
   comp_relational_database:
     name: Relational Database
     kind: managed_service
+    stack:
+      choices:
+        managed_service: PostgreSQL on Amazon RDS (Multi-AZ)

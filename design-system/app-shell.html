@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>App shell</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="prototype-utils.css">
+  <style>
+    .shell { min-height: 100vh; display: flex; flex-direction: column; }
+    .shell-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-2) var(--space-3); border-bottom: var(--border-width) solid var(--color-border); background: var(--color-bg); }
+    .shell-header .btn, .shell-brand, .nav-link { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap-target, 44px); min-width: var(--tap-target, 44px); }
+    .shell-header .btn-sm { padding: 0 var(--space-3); }
+    .shell-header .btn-icon { width: var(--tap-target, 44px); }
+    .shell-brand { font-weight: var(--font-weight-bold); font-size: var(--font-size-lg); color: var(--color-fg); text-decoration: none; }
+    .shell-nav { padding: var(--space-2); background: var(--color-bg-subtle); border-bottom: var(--border-width) solid var(--color-border); }
+    .shell-nav[hidden] { display: none; }
+    .shell-nav ul { display: flex; flex-direction: column; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+    .nav-link { justify-content: flex-start; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--color-fg); text-decoration: none; }
+    .nav-link:hover { background: var(--color-border); }
+    .nav-link[aria-current="page"] { background: var(--color-primary-subtle); color: var(--color-primary); font-weight: var(--font-weight-bold); }
+    .shell-main { flex: 1; min-width: 0; padding: var(--space-3); }
+    .shell-content { max-width: var(--content-max-width); }
+    .shell-footer { padding: var(--space-3); border-top: var(--border-width) solid var(--color-border); color: var(--color-fg-muted); font-size: var(--font-size-sm); }
+    @media (min-width: 48em) {
+      .shell { display: grid; grid-template-columns: var(--nav-width) minmax(0, 1fr); grid-template-rows: auto 1fr auto; }
+      .shell-header { grid-column: 1 / -1; }
+      .shell-header .shell-menu-button { display: none; }
+      .shell-nav, .shell-nav[hidden] { display: block !important; grid-row: 2; border-bottom: 0; border-right: var(--border-width) solid var(--color-border); }
+      .shell-main { grid-column: 2; grid-row: 2; padding: var(--space-4); }
+      .shell-footer { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" data-arc-shell>
+    <header class="shell-header" data-arc-shell-part="header">
+      <div class="cluster">
+        <button class="btn btn-ghost btn-icon shell-menu-button" type="button" data-toggle="main-nav" aria-label="Menu" aria-controls="main-nav">&#9776;</button>
+        <a class="shell-brand" href="#">Console</a>
+      </div>
+      <a class="btn btn-ghost btn-sm" href="#" data-nav-key="account">Account</a>
+    </header>
+    <nav class="shell-nav" id="main-nav" aria-label="Main" data-arc-shell-part="nav" hidden>
+      <ul>
+        <li><a class="nav-link" href="#" data-nav-key="dashboard">Dashboard</a></li>
+        <li><a class="nav-link" href="#" data-nav-key="projects">Projects</a></li>
+        <li><a class="nav-link" href="#" data-nav-key="activity">Activity</a></li>
+        <li><a class="nav-link" href="#" data-nav-key="settings">Settings</a></li>
+      </ul>
+    </nav>
+    <main class="shell-main">
+      <div class="shell-content" data-arc-content></div>
+    </main>
+    <footer class="shell-footer" data-arc-shell-part="footer">Console prototype</footer>
+  </div>
+</body>
+</html>

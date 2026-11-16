@@ -1,5 +1,5 @@
 import { ForbiddenException, UnauthorizedException, type ExecutionContext } from '@nestjs/common';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActorGuard } from '../auth/actor.guard';
 import type { Actor } from '../auth/actor';
 import { AdminListingsController } from './admin-listings.controller';
@@ -63,11 +63,34 @@ describe('restaurant controllers', () => {
 
 describe('ActorGuard', () => {
   const guard = new ActorGuard();
+  const adminHeaders = { 'x-user-id': 'a1', 'x-user-role': 'admin' };
 
-  it('attaches the actor from the headers', () => {
+  beforeEach(() => {
+    vi.stubEnv('ALLOW_DEV_ACTOR_HEADERS', 'true');
+    vi.stubEnv('NODE_ENV', 'test');
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('attaches the actor from the headers when the dev flag is on', () => {
     const { req, context } = contextWith({ 'x-user-id': 'p1', 'x-user-role': 'partner' });
     expect(guard.canActivate(context)).toBe(true);
     expect(req.actor).toEqual({ id: 'p1', role: 'partner' });
+  });
+
+  it('ignores spoofed headers when the dev flag is unset (fails closed)', () => {
+    vi.stubEnv('ALLOW_DEV_ACTOR_HEADERS', '');
+    const { req, context } = contextWith(adminHeaders);
+    guard.canActivate(context);
+    expect(req.actor).toBeUndefined();
+  });
+
+  it('ignores spoofed headers in production even with the dev flag on', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const { req, context } = contextWith(adminHeaders);
+    guard.canActivate(context);
+    expect(req.actor).toBeUndefined();
   });
 
   it('leaves the actor unset for missing or unknown roles', () => {

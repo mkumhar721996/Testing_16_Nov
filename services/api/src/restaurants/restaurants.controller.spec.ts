@@ -1,4 +1,6 @@
-import { ForbiddenException, UnauthorizedException, type ExecutionContext } from '@nestjs/common';
+import { ForbiddenException, NotFoundException, UnauthorizedException, type ExecutionContext } from '@nestjs/common';
+import { InMemoryMenuRepository } from './in-memory-menu.repository';
+import { RestaurantPageService } from './restaurant-page.service';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActorGuard } from '../auth/actor.guard';
 import type { Actor } from '../auth/actor';
@@ -25,7 +27,7 @@ describe('restaurant controllers', () => {
   beforeEach(() => {
     repo = new InMemoryListingRepository();
     const svc = new ListingService(repo);
-    customers = new RestaurantsController(svc);
+    customers = new RestaurantsController(svc, new RestaurantPageService(repo, new InMemoryMenuRepository()));
     admins = new AdminListingsController(svc);
   });
 
@@ -50,6 +52,16 @@ describe('restaurant controllers', () => {
     await admins.approve(admin, created.id);
     const visible = await customers.visible();
     expect(visible).toEqual([{ id: created.id, ...input }]);
+  });
+
+  it('GET /restaurants/:id is 404 until approved, then returns the page (AC 1, 2)', async () => {
+    const created = await customers.create(partner, input);
+    await expect(customers.page(created.id)).rejects.toBeInstanceOf(NotFoundException);
+    await admins.reject(admin, created.id);
+    await expect(customers.page(created.id)).rejects.toBeInstanceOf(NotFoundException);
+    await customers.updateMine(partner, input);
+    await admins.approve(admin, created.id);
+    expect(await customers.page(created.id)).toMatchObject({ id: created.id, name: input.name, categories: [] });
   });
 
   it('only admins reach the queue and the decisions (AC 7, 8)', async () => {

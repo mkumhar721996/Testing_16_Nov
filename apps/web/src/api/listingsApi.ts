@@ -45,6 +45,50 @@ async function request<T>(path: string, init: { method?: string; body?: unknown 
   return (await response.json()) as T
 }
 
+export interface MenuSize {
+  name: string
+  price: number
+}
+
+export interface MenuItem {
+  id: string
+  name: string
+  description: string
+  price: number | null
+  available: boolean
+  sizes: MenuSize[]
+}
+
+export interface MenuCategory {
+  id: string
+  name: string
+  items: MenuItem[]
+}
+
+/** weekday is ISO: 1 = Monday ... 7 = Sunday; times are 'HH:MM' local to the restaurant. */
+export interface OpeningSlot {
+  weekday: number
+  opens: string
+  closes: string
+}
+
+export interface RestaurantPageData {
+  id: string
+  name: string
+  cuisine: string
+  addressCity: string
+  description: string
+  isOpen: boolean
+  temporarilyClosed: boolean
+  closesAt: string | null
+  today: number
+  nextOpening: { weekday: number; opens: string } | null
+  hours: OpeningSlot[]
+  categories: MenuCategory[]
+}
+
+export const getRestaurant = (id: string) => request<RestaurantPageData>(`/restaurants/${encodeURIComponent(id)}`)
+
 export const createListing = (input: ListingInput) =>
   request<Listing>('/restaurant-listings', { method: 'POST', body: input })
 

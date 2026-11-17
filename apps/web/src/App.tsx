@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { devActor } from './api/listingsApi'
 import ListingApprovalsPage from './pages/ListingApprovalsPage'
 import RestaurantListingPage from './pages/RestaurantListingPage'
+import RestaurantPage from './pages/RestaurantPage'
+
+const RESTAURANT_ROUTE = /^#\/restaurants\/([^/]+)$/
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -12,6 +15,15 @@ const NAV = [
 
 export default function App() {
   const [navOpen, setNavOpen] = useState(false)
+  const [hash, setHash] = useState(window.location.hash)
+
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash)
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
+  }, [])
+
+  const restaurantId = RESTAURANT_ROUTE.exec(hash)?.[1]
 
   return (
     <div className="shell">
@@ -48,7 +60,13 @@ export default function App() {
       </nav>
       <main className="shell-main">
         <div className="shell-content">
-          {devActor.role === 'admin' ? <ListingApprovalsPage /> : <RestaurantListingPage />}
+          {restaurantId ? (
+            <RestaurantPage id={restaurantId} />
+          ) : devActor.role === 'admin' ? (
+            <ListingApprovalsPage />
+          ) : (
+            <RestaurantListingPage />
+          )}
         </div>
       </main>
       <footer className="shell-footer">Console</footer>

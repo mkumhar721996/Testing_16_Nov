@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "start": "node dist/main.js",
+    "migrate": "tsc -p tsconfig.build.json && node dist/db/migrate.js",
     "test": "vitest run",
     "e2e": "playwright test",
     "devloop": "tsc -p tsconfig.json --noEmit && vitest run"

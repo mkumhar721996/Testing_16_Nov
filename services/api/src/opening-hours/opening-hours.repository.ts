@@ -21,7 +21,7 @@ export interface OpeningHoursRepository {
   setTemporarilyClosed(restaurantId: string, closed: boolean): Promise<void>;
 }
 
-interface Row {
+export interface Row {
   city: string;
   time_zone: string;
   temporarily_closed: boolean;
@@ -32,27 +32,30 @@ interface Row {
 
 const hhmm = (time: string): string => time.slice(0, 5);
 
+export const FIND_SQL = `select r.city, r.time_zone, r.temporarily_closed, s.weekday, s.opens_at, s.closes_at
+         from restaurants r
+         left join opening_slots s on s.restaurant_id = r.id
+        where r.id = $1
+        order by s.weekday, s.opens_at`;
+
+export function toRestaurantHours(rows: Row[]): RestaurantHours | null {
+  if (rows.length === 0) return null;
+  const hours = emptyWeek();
+  for (const row of rows) {
+    if (row.weekday === null || row.opens_at === null || row.closes_at === null) continue;
+    hours[WEEKDAYS[row.weekday - 1]].push({ opensAt: hhmm(row.opens_at), closesAt: hhmm(row.closes_at) });
+  }
+  const { city, time_zone: timeZone, temporarily_closed: temporarilyClosed } = rows[0];
+  return { city, timeZone, temporarilyClosed, hours };
+}
+
 @Injectable()
 export class PgOpeningHoursRepository implements OpeningHoursRepository {
   constructor(@Inject(DB_POOL) private readonly pool: Pool) {}
 
   async find(restaurantId: string): Promise<RestaurantHours | null> {
-    const { rows } = await this.pool.query<Row>(
-      `select r.city, r.time_zone, r.temporarily_closed, s.weekday, s.opens_at, s.closes_at
-         from restaurants r
-         left join opening_slots s on s.restaurant_id = r.id
-        where r.id = $1
-        order by s.weekday, s.opens_at`,
-      [restaurantId],
-    );
-    if (rows.length === 0) return null;
-    const hours = emptyWeek();
-    for (const row of rows) {
-      if (row.weekday === null || row.opens_at === null || row.closes_at === null) continue;
-      hours[WEEKDAYS[row.weekday - 1]].push({ opensAt: hhmm(row.opens_at), closesAt: hhmm(row.closes_at) });
-    }
-    const { city, time_zone: timeZone, temporarily_closed: temporarilyClosed } = rows[0];
-    return { city, timeZone, temporarilyClosed, hours };
+    const { rows } = await this.pool.query<Row>(FIND_SQL, [restaurantId]);
+    return toRestaurantHours(rows);
   }
 
   async replaceWeek(restaurantId: string, hours: WeekHours): Promise<void> {

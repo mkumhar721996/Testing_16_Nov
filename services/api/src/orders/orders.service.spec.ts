@@ -27,7 +27,7 @@ describe('OrdersService', () => {
     store.addRestaurant(rid, { hours: eveningWeek() });
     // Tuesday 18:30 in Bogota (UTC-5).
     instant = new Date('2026-11-17T23:30:00Z');
-    orders = new OrdersService(store, store, clock);
+    orders = new OrdersService(store, clock);
     hours = new OpeningHoursService(store);
   });
 

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { OpeningHoursRepository, RestaurantHours } from '../opening-hours/opening-hours.repository';
 import type { WeekHours } from '../opening-hours/opening-hours.domain';
-import type { OrdersRepository, PlacedOrder } from '../orders/orders.repository';
+import type { OrderGate, OrdersRepository, PlacedOrder } from '../orders/orders.repository';
 
 /** Test double standing in for PostgreSQL: one shared store behind both repositories. */
 export class InMemoryStore implements OpeningHoursRepository, OrdersRepository {
@@ -31,7 +31,8 @@ export class InMemoryStore implements OpeningHoursRepository, OrdersRepository {
     this.restaurants.get(restaurantId)!.temporarilyClosed = closed;
   }
 
-  async insertPlaced(restaurantId: string): Promise<PlacedOrder> {
+  async placeIfAllowed(restaurantId: string, gate: OrderGate): Promise<PlacedOrder> {
+    gate(await this.find(restaurantId));
     const order: PlacedOrder = { id: randomUUID(), restaurantId, status: 'placed' };
     this.orders.push(order);
     return order;

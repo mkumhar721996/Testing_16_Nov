@@ -9,6 +9,7 @@ metric: monthly uptime
 threshold: 99.9% (Multi-AZ, single region)
 component_id: null
 needs_dedicated_tracking: true
+rule: Production meets 99.9% monthly availability; the database runs Multi-AZ.
 evidence: recommended default, accepted by the human without review
 ---
 

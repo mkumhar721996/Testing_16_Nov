@@ -2,8 +2,8 @@
 id: ADR-0004
 category: component
 title: Relational Database
-status: accepted
-superseded_by: null
+status: superseded
+superseded_by: ADR-0015
 component_id: comp_relational_database
 responsibility: Stores users, roles, permissions, configurations, audit records and
   application data; runs on PostgreSQL (Amazon RDS, Multi-AZ). Also holds the worker's

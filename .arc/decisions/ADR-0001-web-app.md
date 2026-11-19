@@ -2,8 +2,8 @@
 id: ADR-0001
 category: component
 title: Web App
-status: accepted
-superseded_by: null
+status: superseded
+superseded_by: ADR-0012
 component_id: comp_web_app
 responsibility: 'Responsive frontend for end users and administrators: dashboard,
   management screens, configuration pages, reporting, shared UI components.'

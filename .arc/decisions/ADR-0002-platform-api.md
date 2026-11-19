@@ -2,8 +2,8 @@
 id: ADR-0002
 category: component
 title: Platform API
-status: accepted
-superseded_by: null
+status: superseded
+superseded_by: ADR-0013
 component_id: comp_platform_api
 responsibility: 'REST API for the web app and external consumers: authentication,
   user management, role-based access control, notifications, audit logging, configuration

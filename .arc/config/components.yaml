@@ -13,11 +13,11 @@ components:
       evidence: 'Accepted architecture: REST APIs supporting the web application'
     stack:
       choices:
-        styling: tailwind
-        language: typescript
-        framework: react + vite
+        styling: Tailwind CSS
+        language: JavaScript/TypeScript
+        framework: React
         package_manager: pnpm
-        testing_tool_e2e: playwright
+        testing_tool_e2e: Playwright
         testing_tool_unit: vitest
       notes: no existing code in repo at v1; proposed and confirmed
   comp_platform_api:
@@ -45,10 +45,10 @@ components:
     stack:
       choices:
         database: postgresql
-        language: typescript
-        framework: nestjs
+        language: JavaScript/TypeScript
+        framework: NestJS
         package_manager: pnpm
-        testing_tool_e2e: playwright
+        testing_tool_e2e: Playwright
         testing_tool_unit: vitest
       notes: styling not applicable — API only
   comp_platform_worker:
@@ -66,7 +66,7 @@ components:
     stack:
       choices:
         database: postgresql
-        language: typescript
+        language: JavaScript/TypeScript
         package_manager: pnpm
         testing_tool_unit: vitest
       notes: pg-boss job queue library on the PostgreSQL job table; no user-facing
@@ -82,19 +82,32 @@ components:
     name: Marketplace Web App
     repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: web_ui
+    directory: apps/marketplace-web
     integrations:
     - to: comp_marketplace_api
       interaction: sync
       via: http
       status: planned
       evidence: Same pattern as the existing Web App to Platform API seam
+    stack:
+      choices:
+        styling: tailwind
+        language: python
+        framework: fastapi + jinja2 + htmx
+        package_manager: uv
+        testing_tool_e2e: playwright
+        testing_tool_unit: pytest
+      notes: Python at the human's request; server-rendered pages with HTMX, data
+        only through the Marketplace API; Tailwind via standalone CLI
   comp_marketplace_api:
     name: Marketplace API
     repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: api_service
+    directory: services/marketplace-api
     integrations:
     - to: comp_marketplace_database
       interaction: sync
+      via: postgresql
       status: planned
       evidence: unchanged
     - to: comp_marketplace_worker
@@ -108,13 +121,25 @@ components:
       status: planned
       evidence: 'human: ''Stripe''; EPIC-007 online payment before the restaurant
         receives the order, refunds to original payment method'
+    stack:
+      choices:
+        database: postgresql
+        language: python
+        framework: fastapi
+        package_manager: uv
+        testing_tool_e2e: pytest + httpx
+        testing_tool_unit: pytest
+      notes: styling not applicable — API only; Python at the human's request (differs
+        from Platform API's TypeScript)
   comp_marketplace_worker:
     name: Marketplace Worker
     repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: worker
+    directory: services/marketplace-worker
     integrations:
     - to: comp_marketplace_database
       interaction: sync
+      via: postgresql
       status: planned
       evidence: Job table, same pattern as Platform Worker
     - to: external:email-provider
@@ -122,30 +147,71 @@ components:
       status: planned
       evidence: EPIC-010 email order updates, STORY-013 password-reset email; Amazon
         SES accepted default
+    stack:
+      choices:
+        database: postgresql
+        language: python
+        package_manager: uv
+        testing_tool_unit: pytest
+      notes: Python at the human's request; pg-boss is Node-only, so the PostgreSQL
+        job table is driven by Procrastinate; no user-facing surface, so no e2e
   comp_marketplace_database:
     name: Marketplace Database
     repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: managed_service
+    stack:
+      choices:
+        managed_service: PostgreSQL on Amazon RDS (Multi-AZ)
+      notes: architecture names PostgreSQL; deployment puts one RDS Multi-AZ instance
+        per system
   comp_investing_web_app:
     name: Investing Web App
     repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: web_ui
+    directory: apps/investing-web
     integrations:
     - to: comp_investing_api
       interaction: sync
       via: http
       status: planned
       evidence: EPIC-012 sections reload independently through the API
+    stack:
+      choices:
+        styling: tailwind
+        language: python
+        framework: fastapi + jinja2 + htmx
+        package_manager: uv
+        testing_tool_e2e: playwright
+        testing_tool_unit: pytest
+      notes: Python at the human's request; server-rendered pages with HTMX so each
+        dashboard section loads independently; Tailwind via standalone CLI
   comp_investing_api:
     name: Investing API
     repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: api_service
+    directory: services/investing-api
     integrations:
     - to: comp_investing_database
       interaction: sync
+      via: postgresql
       status: planned
       evidence: EPIC-014 to EPIC-016 persistent data
+    stack:
+      choices:
+        database: postgresql
+        language: python
+        framework: fastapi
+        package_manager: uv
+        testing_tool_e2e: pytest + httpx
+        testing_tool_unit: pytest
+      notes: styling not applicable — API only; Python at the human's request (differs
+        from Platform API's TypeScript)
   comp_investing_database:
     name: Investing Database
     repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: managed_service
+    stack:
+      choices:
+        managed_service: PostgreSQL on Amazon RDS (Multi-AZ)
+      notes: architecture names PostgreSQL; deployment puts one RDS Multi-AZ instance
+        per system

@@ -2,8 +2,8 @@
 id: ADR-0003
 category: component
 title: Platform Worker
-status: accepted
-superseded_by: null
+status: superseded
+superseded_by: ADR-0014
 component_id: comp_platform_worker
 responsibility: 'All background jobs: scheduled tasks, notification processing, data
   synchronization and cleanup, report generation.'

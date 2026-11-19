@@ -2,8 +2,8 @@
 id: ADR-0011
 category: cross_cutting
 title: 'Cross-cutting: Tenant isolation'
-status: accepted
-superseded_by: null
+status: superseded
+superseded_by: ADR-0028
 component_id: null
 decision: Shared tables with a tenant ID column, enforced in the API's access control
   layer.

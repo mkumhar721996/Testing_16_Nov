@@ -3,8 +3,8 @@ id: ADR-0007
 category: deployment_target
 title: "Deployment target: AWS, containers on ECS/Fargate for the Platform API and\
   \ Platform Worker; Web\u2026"
-status: accepted
-superseded_by: null
+status: superseded
+superseded_by: ADR-0024
 component_id: null
 decision: AWS, containers on ECS/Fargate for the Platform API and Platform Worker;
   Web App served as static/container assets; environments (prod, staging) and region

@@ -2,7 +2,7 @@
 id: ADR-0009
 category: integration_surface
 title: 'Integration: Email Provider (outbound)'
-status: accepted
+status: retired
 superseded_by: null
 component_id: comp_platform_worker
 evidence: 'recommended default, accepted by the human without review: Amazon SES'

@@ -1,9 +1,16 @@
-version: 1
+version: 2
 components:
   comp_web_app:
     name: Web App
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: web_ui
     directory: apps/web
+    integrations:
+    - to: comp_platform_api
+      interaction: sync
+      via: http
+      status: planned
+      evidence: 'Accepted architecture: REST APIs supporting the web application'
     stack:
       choices:
         styling: tailwind
@@ -12,11 +19,29 @@ components:
         package_manager: pnpm
         testing_tool_e2e: playwright
         testing_tool_unit: vitest
-      notes: no existing code in repo; proposed and confirmed
+      notes: no existing code in repo at v1; proposed and confirmed
   comp_platform_api:
     name: Platform API
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: api_service
     directory: services/api
+    integrations:
+    - to: comp_relational_database
+      interaction: sync
+      via: postgresql
+      status: planned
+      evidence: 'Accepted architecture: database stores users, roles, permissions,
+        audit records'
+    - to: comp_platform_worker
+      interaction: async
+      channel: pg-boss job table
+      status: planned
+      evidence: components.yaml v1 notes pg-boss queue; EPIC-009, EPIC-010, EPIC-011
+    - to: external:microsoft-entra-id
+      interaction: sync
+      status: planned
+      evidence: 'human: ''Entra ID SSO + email only''; EPIC-018; human: ''Both use
+        Entra ID'' (marketplace and investing)'
     stack:
       choices:
         database: postgresql
@@ -28,8 +53,16 @@ components:
       notes: styling not applicable — API only
   comp_platform_worker:
     name: Platform Worker
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: worker
     directory: services/worker
+    integrations:
+    - to: comp_relational_database
+      interaction: sync
+      via: postgresql
+      status: planned
+      evidence: Accepted architecture; pg-boss on the PostgreSQL job table (components.yaml
+        v1)
     stack:
       choices:
         database: postgresql
@@ -40,7 +73,79 @@ components:
         surface, so no e2e
   comp_relational_database:
     name: Relational Database
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
     kind: managed_service
     stack:
       choices:
         managed_service: PostgreSQL on Amazon RDS (Multi-AZ)
+  comp_marketplace_web_app:
+    name: Marketplace Web App
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
+    kind: web_ui
+    integrations:
+    - to: comp_marketplace_api
+      interaction: sync
+      via: http
+      status: planned
+      evidence: Same pattern as the existing Web App to Platform API seam
+  comp_marketplace_api:
+    name: Marketplace API
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
+    kind: api_service
+    integrations:
+    - to: comp_marketplace_database
+      interaction: sync
+      status: planned
+      evidence: unchanged
+    - to: comp_marketplace_worker
+      interaction: async
+      channel: job table
+      status: planned
+      evidence: EPIC-009, EPIC-010 jobs queued by the API
+    - to: external:stripe-api
+      interaction: sync
+      via: http
+      status: planned
+      evidence: 'human: ''Stripe''; EPIC-007 online payment before the restaurant
+        receives the order, refunds to original payment method'
+  comp_marketplace_worker:
+    name: Marketplace Worker
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
+    kind: worker
+    integrations:
+    - to: comp_marketplace_database
+      interaction: sync
+      status: planned
+      evidence: Job table, same pattern as Platform Worker
+    - to: external:email-provider
+      interaction: sync
+      status: planned
+      evidence: EPIC-010 email order updates, STORY-013 password-reset email; Amazon
+        SES accepted default
+  comp_marketplace_database:
+    name: Marketplace Database
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
+    kind: managed_service
+  comp_investing_web_app:
+    name: Investing Web App
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
+    kind: web_ui
+    integrations:
+    - to: comp_investing_api
+      interaction: sync
+      via: http
+      status: planned
+      evidence: EPIC-012 sections reload independently through the API
+  comp_investing_api:
+    name: Investing API
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
+    kind: api_service
+    integrations:
+    - to: comp_investing_database
+      interaction: sync
+      status: planned
+      evidence: EPIC-014 to EPIC-016 persistent data
+  comp_investing_database:
+    name: Investing Database
+    repo_ref: conn-github-f434208052b147e8b1b8bfd354b21489
+    kind: managed_service

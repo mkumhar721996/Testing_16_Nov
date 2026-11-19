@@ -9,6 +9,7 @@ metric: concurrent users
 threshold: 1,000 concurrent users, 50 requests/sec peak
 component_id: null
 needs_dedicated_tracking: true
+rule: The system sustains 1,000 concurrent users and 50 requests/sec peak.
 evidence: recommended default, accepted by the human without review
 ---
 
